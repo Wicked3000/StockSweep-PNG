@@ -169,14 +169,27 @@ export default function App() {
                 <BrowserRouter>
                     <Routes>
                         <Route element={<Layout />}>
-                            <Route path="/" element={<Dashboard />} />
-                            <Route path="/count" element={<StockCount />} />
-                            <Route path="/products" element={<Inventory />} />
-                            <Route path="/sales" element={<RecordSale />} />
-                            <Route path="/reports" element={<Reports />} />
-                            <Route path="/history" element={<SalesHistory />} />
+                            {/* Role-Based Routing */}
+                            {currentUser.role === 'admin' ? (
+                                <>
+                                    <Route path="/" element={<Dashboard />} />
+                                    <Route path="/count" element={<StockCount />} />
+                                    <Route path="/products" element={<Inventory />} />
+                                    <Route path="/sales" element={<RecordSale />} />
+                                    <Route path="/reports" element={<Reports />} />
+                                    <Route path="/history" element={<SalesHistory />} />
+                                </>
+                            ) : (
+                                <>
+                                    {/* Cashier strictly limited to Sales */}
+                                    <Route path="/sales" element={<RecordSale />} />
+                                    {/* Redirect all other paths to sales */}
+                                    <Route path="*" element={<RecordSale />} />
+                                </>
+                            )}
                         </Route>
                     </Routes>
+
                     <Toaster 
                         position="top-center" 
                         theme="dark"
