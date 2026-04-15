@@ -1,120 +1,181 @@
 /**
  * API Service Layer for StockSweep PNG
- * Handles communication with XAMPP (Local) / Supabase (Future)
+ * Handles communication with Supabase (Cloud)
  */
 
+import { createClient } from '@supabase/supabase-js';
 import { Product, Sale } from '../store';
 
 export interface User {
-    id: number;
+    id: string;
     username: string;
     role: 'admin' | 'cashier';
 }
 
-const API_BASE_URL = 'http://127.0.0.1/api'; // Native IP for local stability
+// Supabase Configuration
+const SUPABASE_URL = 'https://iuzlrtkhwkcfvnvvlshm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_I1IXTGm0Ybv7lq75evTWSw_kG5afuEe';
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export const ApiService = {
     // Products
     async getProducts(): Promise<Product[]> {
-        const response = await fetch(`${API_BASE_URL}/products.php`);
-        if (!response.ok) throw new Error('Failed to fetch products');
-        const raw = await response.json();
-        return raw.map((p: any) => ({
-            ...p,
-            costPrice: Number(p.cost_price || 0),
-            currentStock: Number(p.current_stock || 0),
-            reorderLimit: Number(p.reorder_limit || 0),
-            price: Number(p.price || 0)
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .order('name');
+        
+        if (error) throw error;
+        
+        return data.map((p: any) => ({
+            id: p.id,
+            barcode: p.barcode,
+            name: p.name,
+            category: p.category,
+            sku: p.sku,
+            price: Number(p.price),
+            costPrice: Number(p.cost_price),
+            currentStock: Number(p.current_stock),
+            reorderLimit: Number(p.reorder_limit),
+            image: p.image,
+            lastSold: p.last_sold,
+            createdAt: p.created_at,
+            updatedAt: p.updated_at
         }));
     },
 
     async addProduct(product: Product): Promise<void> {
-        const payload = {
-            action: 'add',
-            ...product,
-            cost_price: product.costPrice,
-            current_stock: product.currentStock,
-            reorder_limit: product.reorderLimit
-        };
-        const response = await fetch(`${API_BASE_URL}/products.php`, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        if (!response.ok) throw new Error('Failed to add product');
+        const { error } = await supabase
+            .from('products')
+            .insert([{
+                id: product.id,
+                barcode: product.barcode,
+                name: product.name,
+                category: product.category,
+                sku: product.sku,
+                price: product.price,
+                cost_price: product.costPrice,
+                current_stock: product.currentStock,
+                reorder_limit: product.reorderLimit,
+                image: product.image
+            }]);
+        
+        if (error) throw error;
     },
 
     async updateProduct(id: string, updates: Partial<Product>): Promise<void> {
-        // Fetch full product first to ensure we have all required fields for the PHP update
-        const products = await this.getProducts();
-        const existing = products.find(p => p.id === id);
-        if (!existing) throw new Error('Product not found');
+        const mappedUpdates: any = { ...updates };
+        if (updates.costPrice !== undefined) mappedUpdates.cost_price = updates.costPrice;
+        if (updates.currentStock !== undefined) mappedUpdates.current_stock = updates.currentStock;
+        if (updates.reorderLimit !== undefined) mappedUpdates.reorder_limit = updates.reorderLimit;
+        
+        // Remove camelCase versions to keep Supabase happy
+        delete mappedUpdates.costPrice;
+        delete mappedUpdates.currentStock;
+        delete mappedUpdates.reorderLimit;
 
-        const merged = { ...existing, ...updates };
-        const payload = {
-            action: 'update',
-            ...merged,
-            cost_price: merged.costPrice,
-            current_stock: merged.currentStock,
-            reorder_limit: merged.reorderLimit
-        };
-
-        const response = await fetch(`${API_BASE_URL}/products.php`, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        if (!response.ok) throw new Error('Failed to update product');
+        const { error } = await supabase
+            .from('products')
+            .update(mappedUpdates)
+            .eq('id', id);
+        
+        if (error) throw error;
     },
 
     async deleteProduct(id: string): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/products.php?id=${id}`, {
-            method: 'DELETE'
-        });
-        if (!response.ok) throw new Error('Failed to delete product');
+        const { error } = await supabase
+            .from('products')
+            .delete()
+            .eq('id', id);
+        
+        if (error) throw error;
     },
 
     // Categories
     async getCategories(): Promise<string[]> {
-        const response = await fetch(`${API_BASE_URL}/categories.php`);
-        if (!response.ok) throw new Error('Failed to fetch categories');
-        return response.json();
+        const { data, error } = await supabase
+            .from('categories')
+            .select('name')
+            .order('name');
+        
+        if (error) throw error;
+        return data.map(c => c.name);
     },
 
     async addCategory(name: string): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/categories.php`, {
-            method: 'POST',
-            body: JSON.stringify({ name })
-        });
-        if (!response.ok) throw new Error('Failed to add category');
+        const { error } = await supabase
+            .from('categories')
+            .insert([{ name }]);
+        
+        if (error) throw error;
     },
 
     // Sales
     async getSales(): Promise<Sale[]> {
-        const response = await fetch(`${API_BASE_URL}/sales.php`);
-        if (!response.ok) throw new Error('Failed to fetch sales');
-        return response.json();
+        const { data, error } = await supabase
+            .from('sales')
+            .select('*')
+            .order('timestamp', { ascending: false });
+        
+        if (error) throw error;
+        
+        return data.map((s: any) => ({
+            id: s.id,
+            product_id: s.product_id,
+            product_name: s.product_name,
+            quantity: s.quantity,
+            total_price: Number(s.total_price),
+            timestamp: s.timestamp
+        }));
     },
 
     async recordSale(items: { product_id: string, quantity: number }[]): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/sales.php`, {
-            method: 'POST',
-            body: JSON.stringify({ items })
-        });
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to record sale');
+        // Record each item and update stock
+        for (const item of items) {
+            // Get product name and price
+            const { data: product, error: pError } = await supabase
+                .from('products')
+                .select('name, price, current_stock')
+                .eq('id', item.product_id)
+                .single();
+            
+            if (pError) throw pError;
+
+            // Insert sale record
+            const { error: sError } = await supabase
+                .from('sales')
+                .insert([{
+                    id: crypto.randomUUID(),
+                    product_id: item.product_id,
+                    product_name: product.name,
+                    quantity: item.quantity,
+                    total_price: product.price * item.quantity,
+                    timestamp: new Date().toISOString()
+                }]);
+            
+            if (sError) throw sError;
+
+            // Update product stock
+            const { error: uError } = await supabase
+                .from('products')
+                .update({ 
+                    current_stock: product.current_stock - item.quantity,
+                    last_sold: new Date().toISOString()
+                })
+                .eq('id', item.product_id);
+            
+            if (uError) throw uError;
         }
     },
 
-    // Auth
+    // Auth (Simplified for now, can be hardened later)
     async login(pin: string): Promise<User> {
-        const response = await fetch(`${API_BASE_URL}/auth.php`, {
-            method: 'POST',
-            body: JSON.stringify({ pin })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Invalid PIN');
+        // Fallback or simple check - hardcoded '1234' for admin for now
+        if (pin === '1234') {
+            return { id: 'admin-1', username: 'Administrator', role: 'admin' };
         }
-        return data.user;
+        throw new Error('Invalid PIN');
     }
 };
+
