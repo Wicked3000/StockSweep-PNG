@@ -126,23 +126,25 @@ export const ApiService = {
             product_name: s.product_name,
             quantity: s.quantity,
             total_price: Number(s.total_price),
+            cost_total: Number(s.cost_total),
             timestamp: s.timestamp
         }));
+
     },
 
     async recordSale(items: { product_id: string, quantity: number }[]): Promise<void> {
         // Record each item and update stock
         for (const item of items) {
-            // Get product name and price
+            // Get product name, price, and cost price
             const { data: product, error: pError } = await supabase
                 .from('products')
-                .select('name, price, current_stock')
+                .select('name, price, cost_price, current_stock')
                 .eq('id', item.product_id)
                 .single();
             
             if (pError) throw pError;
 
-            // Insert sale record
+            // Insert sale record with cost_total for profit tracking
             const { error: sError } = await supabase
                 .from('sales')
                 .insert([{
@@ -151,10 +153,12 @@ export const ApiService = {
                     product_name: product.name,
                     quantity: item.quantity,
                     total_price: product.price * item.quantity,
+                    cost_total: product.cost_price * item.quantity,
                     timestamp: new Date().toISOString()
                 }]);
             
             if (sError) throw sError;
+
 
             // Update product stock
             const { error: uError } = await supabase
