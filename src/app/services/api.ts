@@ -173,13 +173,24 @@ export const ApiService = {
         }
     },
 
-    // Auth (Simplified for now, can be hardened later)
+    // Auth (Cloud Powered)
     async login(pin: string): Promise<User> {
-        // Fallback or simple check - hardcoded '1234' for admin for now
-        if (pin === '1234') {
-            return { id: 'admin-1', username: 'Administrator', role: 'admin' };
+        const { data, error } = await supabase
+            .from('users')
+            .select('id, username, role')
+            .eq('pin', pin)
+            .single();
+
+        if (error || !data) {
+            throw new Error('Invalid PIN. Please try again.');
         }
-        throw new Error('Invalid PIN');
+
+        return {
+            id: String(data.id),
+            username: data.username,
+            role: data.role as 'admin' | 'cashier'
+        };
     }
 };
+
 
