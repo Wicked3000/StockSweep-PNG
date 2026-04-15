@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink, Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
-import { Home, Boxes, Package, ShoppingCart, BarChart3, Database, RefreshCcw, Loader2 } from 'lucide-react';
+import { Home, Boxes, Package, ShoppingCart, BarChart3, Database, RefreshCcw, Loader2, ArrowRight } from 'lucide-react';
 
 import { useInventoryStore } from './store';
 import { Dashboard } from './components/Dashboard';
