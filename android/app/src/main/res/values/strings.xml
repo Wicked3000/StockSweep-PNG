@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">StockSweep PNG</string>
+    <string name="title_activity_main">StockSweep PNG</string>
+    <string name="package_name">com.stocksweep.png</string>
+    <string name="custom_url_scheme">com.stocksweep.png</string>
+</resources>

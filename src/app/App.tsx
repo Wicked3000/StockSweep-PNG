@@ -134,19 +134,20 @@ function ConnectionGuard({ children }: { children: React.ReactNode }) {
                         {error}
                     </code>
                 </div>
-                <div className="flex flex-col gap-3 w-full max-w-xs">
+                <div className="flex flex-col gap-3 w-full max-w-xs transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
                     <button 
                         onClick={() => initialize()}
                         className="flex items-center justify-center gap-3 px-8 py-5 bg-white text-slate-950 rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-400 transition-all active:scale-95 shadow-2xl"
                     >
-                        <RefreshCcw size={20} />
-                        Retry Connection
+                        <RefreshCcw size={20} className="animate-spin-slow" />
+                        Retry Sync
                     </button>
                     <button 
                         onClick={() => setBypass(true)}
-                        className="text-slate-500 font-bold uppercase text-[10px] tracking-widest hover:text-slate-300 transition-colors"
+                        className="group flex items-center justify-center gap-2 py-4 text-slate-500 font-bold uppercase text-[10px] tracking-widest hover:text-emerald-400 transition-colors"
                     >
-                        Continue to app anyway (Offline)
+                        <span>Continue in Standalone Mode</span>
+                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>
             </div>

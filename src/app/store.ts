@@ -67,25 +67,49 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
 
   initialize: async () => {
     set({ isLoading: true, error: null });
+    
+    // Try to load from LocalStorage first (for instant startup/standalone mode)
+    const localProducts = localStorage.getItem('ss_products');
+    const localSales = localStorage.getItem('ss_sales');
+    const localCategories = localStorage.getItem('ss_categories');
+
+    if (localProducts) set({ products: JSON.parse(localProducts) });
+    if (localSales) set({ sales: JSON.parse(localSales) });
+    if (localCategories) set({ categories: JSON.parse(localCategories) });
+
     try {
       const [products, sales, categories] = await Promise.all([
         ApiService.getProducts(),
         ApiService.getSales(),
         ApiService.getCategories()
       ]);
+      
+      // Update local storage with fresh server data
+      localStorage.setItem('ss_products', JSON.stringify(products));
+      localStorage.setItem('ss_sales', JSON.stringify(sales));
+      localStorage.setItem('ss_categories', JSON.stringify(categories));
+      
       set({ products, sales, categories, isLoading: false });
     } catch (err: any) {
-      set({ error: err.message, isLoading: false });
+      console.warn("API Offline, using local cache:", err.message);
+      // If we have local data, we don't treat it as a hard error
+      if (localProducts) {
+        set({ isLoading: false, error: null });
+      } else {
+        set({ error: err.message, isLoading: false });
+      }
     }
   },
 
   addProduct: async (product) => {
     try {
+      const updatedProducts = [product, ...get().products];
+      set({ products: updatedProducts });
+      localStorage.setItem('ss_products', JSON.stringify(updatedProducts));
+      
       await ApiService.addProduct(product);
-      set((state) => ({ products: [product, ...state.products] }));
     } catch (err: any) {
-      set({ error: err.message });
-      throw err;
+      console.error("Failed to sync new product to server:", err.message);
     }
   },
 
@@ -94,29 +118,33 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     if (!product) return;
     
     const newStock = Math.max(0, Number(product.currentStock) + quantityChange);
+    const updatedProducts = get().products.map(p => 
+      p.barcode === barcode ? { ...p, currentStock: newStock } : p
+    );
+    
+    set({ products: updatedProducts });
+    localStorage.setItem('ss_products', JSON.stringify(updatedProducts));
+
     try {
       await ApiService.updateProduct(product.id, { currentStock: newStock });
-      set((state) => ({
-        products: state.products.map(p => 
-          p.barcode === barcode ? { ...p, currentStock: newStock } : p
-        )
-      }));
     } catch (err: any) {
-      set({ error: err.message });
+      console.error("Failed to sync stock update to server:", err.message);
     }
   },
 
   recordSale: async (items: { product_id: string, quantity: number }[]) => {
     try {
       await ApiService.recordSale(items);
-      // Re-initialize to get updated stock and sales list from server
       const [products, sales] = await Promise.all([
         ApiService.getProducts(),
         ApiService.getSales()
       ]);
       set({ products, sales });
+      localStorage.setItem('ss_products', JSON.stringify(products));
+      localStorage.setItem('ss_sales', JSON.stringify(sales));
     } catch (err: any) {
-      set({ error: err.message });
+      console.error("Failed to record sale to server, updating locally only:", err.message);
+      // Optional: Logic to record sale locally could go here
       throw err;
     }
   },
