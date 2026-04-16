@@ -1,16 +1,61 @@
-import { useState, useMemo, useRef } from 'react';
-import { Share2, Plus, Edit3, Trash2, Search, X, Package } from 'lucide-react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { Share2, Plus, Edit3, Trash2, Search, X, Package, RefreshCcw } from 'lucide-react';
 import { useInventoryStore, formatKina, Product } from '../store';
 import { ProductEditor } from './ProductEditor';
 import { toast } from 'sonner';
 
 export function Inventory() {
-  const { products, deleteProduct, categories } = useInventoryStore();
+  const { products, deleteProduct, categories, initialize, isLoading } = useInventoryStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null | undefined>(undefined);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Pull to refresh state
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const touchStartRef = useRef(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (scrollRef.current && scrollRef.current.scrollTop === 0) {
+      touchStartRef.current = e.touches[0].clientY;
+    } else {
+      touchStartRef.current = 0;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartRef.current === 0 || isRefreshing) return;
+    
+    const currentY = e.touches[0].clientY;
+    const distance = currentY - touchStartRef.current;
+    
+    if (distance > 0) {
+      // Apply some resistance
+      const pull = Math.min(100, Math.pow(distance, 0.7) * 4);
+      setPullDistance(pull);
+      if (pull > 80 && e.cancelable) e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (pullDistance > 80 && !isRefreshing) {
+      setIsRefreshing(true);
+      setPullDistance(60); // Hold at active position
+      try {
+        await initialize();
+        toast.success("Inventory synchronized");
+      } catch (err) {
+        toast.error("Sync failed");
+      }
+      setIsRefreshing(false);
+      setPullDistance(0);
+    } else {
+      setPullDistance(0);
+    }
+    touchStartRef.current = 0;
+  };
 
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
@@ -55,7 +100,28 @@ export function Inventory() {
   };
 
   return (
-    <div className="flex flex-col p-6 space-y-6 animate-in slide-in-from-right-4 duration-700 min-h-full">
+    <div 
+      ref={scrollRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="flex flex-col p-6 space-y-6 animate-in slide-in-from-right-4 duration-700 min-h-full overflow-y-auto no-scrollbar"
+      style={{ transform: `translateY(${pullDistance}px)`, transition: pullDistance === 0 ? 'transform 0.3s ease' : 'none' }}
+    >
+      {/* Pull indicator */}
+      <div 
+        className="absolute left-0 right-0 flex justify-center pointer-events-none transition-opacity duration-300"
+        style={{ 
+          top: `-${Math.max(40, pullDistance)}px`,
+          opacity: pullDistance > 20 ? 1 : 0,
+          transform: `rotate(${pullDistance * 3}deg)`
+        }}
+      >
+        <div className="bg-emerald-500 p-2 rounded-full shadow-lg text-emerald-950">
+          <RefreshCcw size={20} className={isRefreshing ? 'animate-spin' : ''} />
+        </div>
+      </div>
+
       <header className="flex justify-between items-center">
         <div>
             <h1 className="text-2xl font-black text-white px-1 tracking-tight uppercase">Inventory</h1>
@@ -105,7 +171,6 @@ export function Inventory() {
 
       {/* Category Filter Pills */}
       <div 
-        ref={scrollRef}
         className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth"
       >
         <button
@@ -254,3 +319,4 @@ export function Inventory() {
     </div>
   );
 }
+

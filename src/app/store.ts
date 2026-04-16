@@ -55,6 +55,10 @@ interface InventoryState {
   currentUser: User | null;
   login: (pin: string) => Promise<void>;
   logout: () => void;
+  
+  // Network
+  isOnline: boolean;
+  setOnline: (status: boolean) => void;
 }
 
 export const useInventoryStore = create<InventoryState>((set, get) => ({
@@ -64,8 +68,15 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   isLoading: false,
   error: null,
   currentUser: null,
+  isOnline: window.navigator.onLine,
+
+  setOnline: (status: boolean) => set({ isOnline: status }),
 
   initialize: async () => {
+    // Setup online/offline listeners
+    window.addEventListener('online', () => get().setOnline(true));
+    window.addEventListener('offline', () => get().setOnline(false));
+
     set({ isLoading: true, error: null });
     
     // Try to load from LocalStorage first (for instant startup/standalone mode)

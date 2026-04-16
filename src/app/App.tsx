@@ -32,15 +32,31 @@ function Layout() {
       {/* Mobile App Proxy Frame - Fluid on small screens, framed on large */}
       <div className="flex flex-col w-full sm:max-w-lg h-full bg-slate-950 relative sm:border-x border-white/5 shadow-2xl">
       <div className="shrink-0 flex justify-between items-center px-6 pt-[calc(1.25rem+env(safe-area-inset-top))] pb-5 z-40 bg-slate-950/50 backdrop-blur-sm border-b border-white/5">
-
-
-        {/* Branding - Precision Aligned */}
-        <div className="flex items-center gap-2 opacity-60">
-           <div className="bg-emerald-500/10 p-1.5 rounded-lg border border-emerald-500/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        {/* Branding - Global Cloud Status */}
+        <div className="flex items-center gap-2">
+           <div className={`p-1.5 rounded-lg border transition-all duration-500 ${
+             !isOnline ? 'bg-red-500/10 border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.2)]' :
+             isLoading ? 'bg-amber-500/10 border-amber-500/20 animate-pulse' :
+             'bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+           }`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" 
+                className={!isOnline ? 'text-red-500' : isLoading ? 'text-amber-500' : 'text-emerald-500'}
+              >
+                <path d="M17.5 19c.7 0 1.3-.2 1.8-.7s.7-1.1.7-1.8c0-1.3-1-2.4-2.2-2.5C17.4 12.3 16.2 11 14.7 11c-1.3 0-2.4.9-2.7 2.1C11.5 13 11 13 10.5 13c-1.9 0-3.5 1.6-3.5 3.5S8.6 20 10.5 20h7"></path>
+                <path d="M12 11V3"></path>
+                <path d="m9 6 3-3 3 3"></path>
+              </svg>
            </div>
-           <span className="text-[10px] font-black tracking-[0.2em] uppercase text-slate-300 font-mono leading-none">StockSweep Cloud</span>
+           <div className="flex flex-col">
+             <span className="text-[10px] font-black tracking-[0.2em] uppercase text-slate-300 font-mono leading-none">StockSweep Cloud</span>
+             <span className={`text-[8px] font-bold uppercase tracking-widest mt-1 ${
+               !isOnline ? 'text-red-400' : isLoading ? 'text-amber-400' : 'text-emerald-400/60'
+             }`}>
+               {!isOnline ? 'Offline Mode' : isLoading ? 'Syncing...' : 'Connected'}
+             </span>
+           </div>
         </div>
+
 
         {/* User Auth Info - Balanced Pill */}
         {currentUser && (
