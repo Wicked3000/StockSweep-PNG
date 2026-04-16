@@ -31,27 +31,33 @@ function Layout() {
     <div className="h-[100dvh] w-full bg-black flex justify-center text-slate-50 font-sans select-none overflow-hidden">
       {/* Mobile App Proxy Frame - Fluid on small screens, framed on large */}
       <div className="flex flex-col w-full sm:max-w-lg h-full bg-slate-950 relative sm:border-x border-white/5 shadow-2xl">
-        {/* Top Header info (Persistent Top Bar) */}
-      <div className="shrink-0 flex justify-between items-center px-6 pt-4 pt-safe pb-0 z-40">
-
-
-        {/* Branding */}
-        <div className="flex items-center gap-2 opacity-50">
-           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-           <span className="text-[10px] font-black tracking-widest uppercase text-slate-400 font-mono">StockSweep Cloud</span>
+      <div className="shrink-0 flex justify-between items-center px-6 pt-4 pt-safe pb-2 z-40 bg-slate-950/50 backdrop-blur-sm">
+        {/* Branding - Precision Aligned */}
+        <div className="flex items-center gap-2 opacity-60">
+           <div className="bg-emerald-500/10 p-1.5 rounded-lg border border-emerald-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+           </div>
+           <span className="text-[10px] font-black tracking-[0.2em] uppercase text-slate-300 font-mono leading-none">StockSweep Cloud</span>
         </div>
 
-        {/* User Auth Info */}
+        {/* User Auth Info - Balanced Pill */}
         {currentUser && (
-            <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur border border-white/5 px-3 py-1.5 rounded-full shadow-lg">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
-                <span className="text-[10px] font-black tracking-widest uppercase text-slate-300">{currentUser.username}</span>
-                <button onClick={logout} className="ml-2 text-red-500 hover:text-red-400 transition-colors p-1 bg-red-500/10 hover:bg-red-500/20 rounded-full" aria-label="Logout">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <div className="flex items-center gap-2.5 bg-slate-900 border border-white/5 pl-3 pr-1 py-1 rounded-full shadow-lg">
+                <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+                    <span className="text-[10px] font-black tracking-widest uppercase text-slate-100 leading-none mt-[1px]">{currentUser.username}</span>
+                </div>
+                <button 
+                    onClick={logout} 
+                    className="flex items-center justify-center w-8 h-8 text-red-500 hover:text-red-400 transition-colors bg-red-500/10 hover:bg-red-500/20 rounded-full border border-red-500/10" 
+                    aria-label="Logout"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 </button>
             </div>
         )}
       </div>
+
 
       <div className="flex-1 overflow-y-auto pb-safe scroll-smooth mb-[70px]">
         <Outlet />
