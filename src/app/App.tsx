@@ -28,11 +28,12 @@ function Layout() {
   const tabs = allTabs.filter(t => t.roles.includes(currentUser?.role || ''));
 
   return (
-    <div className="h-screen w-full bg-black flex justify-center text-slate-50 font-sans select-none overflow-hidden">
+    <div className="h-[100dvh] w-full bg-black flex justify-center text-slate-50 font-sans select-none overflow-hidden">
       {/* Mobile App Proxy Frame - Fluid on small screens, framed on large */}
       <div className="flex flex-col w-full sm:max-w-lg h-full bg-slate-950 relative sm:border-x border-white/5 shadow-2xl">
         {/* Top Header info (Persistent Top Bar) */}
       <div className="shrink-0 flex justify-between items-center px-6 pt-safe pb-0 z-40">
+
         {/* Branding */}
         <div className="flex items-center gap-2 opacity-50">
            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
