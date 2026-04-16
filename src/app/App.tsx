@@ -31,7 +31,8 @@ function Layout() {
     <div className="h-[100dvh] w-full bg-black flex justify-center text-slate-50 font-sans select-none overflow-hidden">
       {/* Mobile App Proxy Frame - Fluid on small screens, framed on large */}
       <div className="flex flex-col w-full sm:max-w-lg h-full bg-slate-950 relative sm:border-x border-white/5 shadow-2xl">
-      <div className="shrink-0 flex justify-between items-center px-6 pt-4 pt-safe pb-2 z-40 bg-slate-950/50 backdrop-blur-sm">
+      <div className="shrink-0 flex justify-between items-center px-6 py-5 pt-safe z-40 bg-slate-950/50 backdrop-blur-sm border-b border-white/5">
+
         {/* Branding - Precision Aligned */}
         <div className="flex items-center gap-2 opacity-60">
            <div className="bg-emerald-500/10 p-1.5 rounded-lg border border-emerald-500/20">
