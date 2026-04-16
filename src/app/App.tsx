@@ -32,7 +32,8 @@ function Layout() {
       {/* Mobile App Proxy Frame - Fluid on small screens, framed on large */}
       <div className="flex flex-col w-full sm:max-w-lg h-full bg-slate-950 relative sm:border-x border-white/5 shadow-2xl">
         {/* Top Header info (Persistent Top Bar) */}
-      <div className="shrink-0 flex justify-between items-center px-6 pt-safe pb-0 z-40">
+      <div className="shrink-0 flex justify-between items-center px-6 pt-4 pt-safe pb-0 z-40">
+
 
         {/* Branding */}
         <div className="flex items-center gap-2 opacity-50">
