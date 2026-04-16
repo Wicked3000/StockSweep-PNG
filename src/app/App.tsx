@@ -15,7 +15,7 @@ import { Login } from './components/Login';
 import { LogOut } from 'lucide-react';
 
 function Layout() {
-  const { currentUser, logout } = useInventoryStore();
+  const { currentUser, logout, isOnline, isLoading } = useInventoryStore();
 
   const allTabs = [
     { to: '/', icon: Home, label: 'Home', roles: ['admin'] },
