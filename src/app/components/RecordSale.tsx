@@ -132,8 +132,9 @@ export function RecordSale() {
                 }
               }}
               placeholder="Search or scan barcode..."
-              className="block w-full pl-11 pr-4 py-4 bg-slate-900 border border-white/5 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-medium"
+              className="block w-full pl-11 pr-4 py-4 bg-slate-900 border border-white/5 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-medium input-mobile-fix"
             />
+
 
             {filteredProducts.length > 0 && !selectedProduct && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl z-[60] max-h-60 overflow-y-auto">
@@ -374,9 +375,10 @@ export function RecordSale() {
                             value={cashTendered} 
                             onChange={(e) => setCashTendered(e.target.value)}
                             placeholder="e.g. 50"
-                            className="w-full bg-slate-950 border border-white/10 rounded-xl py-4 px-6 text-3xl font-black text-white text-center focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder-slate-700 hover:bg-slate-900"
+                            className="w-full bg-slate-950 border border-white/10 rounded-xl py-4 px-6 text-3xl font-black text-white text-center focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder-slate-700 hover:bg-slate-900 input-mobile-fix"
                             autoFocus
                         />
+
                     </div>
 
                     {/* Change Display */}

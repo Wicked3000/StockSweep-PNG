@@ -29,14 +29,14 @@ function Layout() {
 
   return (
     <div className="h-screen w-full bg-black flex justify-center text-slate-50 font-sans select-none overflow-hidden">
-      {/* Mobile App Proxy Frame */}
-      <div className="flex flex-col w-full max-w-lg h-full bg-slate-950 relative border-x border-white/5 shadow-2xl">
+      {/* Mobile App Proxy Frame - Fluid on small screens, framed on large */}
+      <div className="flex flex-col w-full sm:max-w-lg h-full bg-slate-950 relative sm:border-x border-white/5 shadow-2xl">
         {/* Top Header info (Persistent Top Bar) */}
-      <div className="shrink-0 flex justify-between items-center px-6 pt-4 pb-0 z-40">
+      <div className="shrink-0 flex justify-between items-center px-6 pt-safe pb-0 z-40">
         {/* Branding */}
         <div className="flex items-center gap-2 opacity-50">
            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-           <span className="text-[10px] font-black tracking-widest uppercase text-slate-400">StockSweep</span>
+           <span className="text-[10px] font-black tracking-widest uppercase text-slate-400 font-mono">StockSweep Cloud</span>
         </div>
 
         {/* User Auth Info */}
@@ -51,7 +51,7 @@ function Layout() {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-24 scroll-smooth">
+      <div className="flex-1 overflow-y-auto pb-safe scroll-smooth mb-[70px]">
         <Outlet />
       </div>
       
@@ -106,14 +106,21 @@ function ConnectionGuard({ children }: { children: React.ReactNode }) {
 
     if (isLoading && !bypass) {
         return (
-            <div className="absolute inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center space-y-6">
-                <div className="relative">
-                    <Loader2 className="w-16 h-16 text-emerald-500 animate-spin" />
-                    <Database className="absolute inset-0 m-auto w-6 h-6 text-emerald-400" />
+            <div className="absolute inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center">
+                <div className="relative mb-8">
+                    <div className="w-24 h-24 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    </div>
+                    <Loader2 className="absolute top-0 right-0 w-8 h-8 text-emerald-400 animate-spin -translate-y-2 translate-x-2" />
                 </div>
-                <div className="text-center space-y-2">
-                    <h2 className="text-xl font-black text-white uppercase tracking-tighter italic">Syncing Data</h2>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest animate-pulse">Connecting to XAMPP Server...</p>
+                <div className="text-center space-y-3">
+                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">StockSweep</h2>
+                    <div className="flex items-center justify-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-bounce"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.2s]"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.4s]"></span>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">Waking Up Cloud Services...</p>
+                    </div>
                 </div>
             </div>
         );
@@ -126,9 +133,9 @@ function ConnectionGuard({ children }: { children: React.ReactNode }) {
                     <Database size={40} />
                 </div>
                 <div className="space-y-4">
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic">Database Offline</h2>
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic">Cloud Offline</h2>
                     <p className="text-slate-500 font-medium leading-relaxed max-w-xs mx-auto">
-                        We couldn't reach your XAMPP server. Please make sure **Apache** and **MySQL** are running in your XAMPP Control Panel.
+                        We couldn't reach your Supabase cloud instance. Please check your data connection or Wi-Fi.
                     </p>
                     <code className="block bg-slate-900 p-3 rounded-xl text-[10px] text-red-400 font-mono border border-white/5 whitespace-pre-wrap break-all">
                         {error}
@@ -140,14 +147,7 @@ function ConnectionGuard({ children }: { children: React.ReactNode }) {
                         className="flex items-center justify-center gap-3 px-8 py-5 bg-white text-slate-950 rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-400 transition-all active:scale-95 shadow-2xl"
                     >
                         <RefreshCcw size={20} className="animate-spin-slow" />
-                        Retry Sync
-                    </button>
-                    <button 
-                        onClick={() => setBypass(true)}
-                        className="group flex items-center justify-center gap-2 py-4 text-slate-500 font-bold uppercase text-[10px] tracking-widest hover:text-emerald-400 transition-colors"
-                    >
-                        <span>Continue in Standalone Mode</span>
-                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        Retry Cloud Sync
                     </button>
                 </div>
             </div>
@@ -156,6 +156,7 @@ function ConnectionGuard({ children }: { children: React.ReactNode }) {
 
     return <>{children}</>;
 }
+
 
 export default function App() {
   const { currentUser } = useInventoryStore();

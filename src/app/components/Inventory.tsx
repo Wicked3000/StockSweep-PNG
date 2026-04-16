@@ -89,8 +89,9 @@ export function Inventory() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search items, categories..."
-          className="block w-full pl-11 pr-12 py-4 bg-slate-900 border border-white/5 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all font-medium"
+          className="block w-full pl-11 pr-12 py-4 bg-slate-900 border border-white/5 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all font-medium input-mobile-fix"
         />
+
         {searchTerm && (
             <button 
                 onClick={() => setSearchTerm('')}
