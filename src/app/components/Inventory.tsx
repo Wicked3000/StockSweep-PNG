@@ -18,7 +18,7 @@ export function Inventory() {
   const touchStartRef = useRef(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (scrollRef.current && scrollRef.current.scrollTop === 0) {
+    if (scrollRef.current && scrollRef.current.scrollTop === 0 && e.touches[0]) {
       touchStartRef.current = e.touches[0].clientY;
     } else {
       touchStartRef.current = 0;
@@ -26,7 +26,7 @@ export function Inventory() {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartRef.current === 0 || isRefreshing) return;
+    if (touchStartRef.current === 0 || isRefreshing || !e.touches[0]) return;
     
     const currentY = e.touches[0].clientY;
     const distance = currentY - touchStartRef.current;
